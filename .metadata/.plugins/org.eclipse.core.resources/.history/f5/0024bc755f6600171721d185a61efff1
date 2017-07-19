@@ -1,0 +1,10 @@
+package exit.services.principal;
+
+import java.util.List;
+
+public class EjecutarQBESP {
+	
+	public void ejecutarCampaniaCumpleanios(List<Long> listaClientSec){
+		
+	}
+}

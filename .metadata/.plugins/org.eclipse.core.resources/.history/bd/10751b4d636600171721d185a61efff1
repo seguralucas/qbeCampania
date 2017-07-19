@@ -1,0 +1,22 @@
+package exit.services.principal;
+
+import java.util.List;
+
+import exit.services.principal.peticiones.EPeticiones;
+import exit.services.principal.peticiones.GetExistFieldURLQueryRightNow;
+import exit.services.singletons.RecEntAct;
+import exit.services.singletons.RecuperadorPropiedadesConfiguracionGenerales;
+
+public class EjecutarQBESP {
+	
+	
+	private final String URL_QBE_SERVICIOS="https://qbe.custhelp.com/services/rest/connect/v1.3/";
+	private final String URL_QBE_QUERYS=URL_QBE_SERVICIOS+"queryResults/?query=";
+	
+	public void ejecutarCampaniaCumpleanios(List<Integer> listaClientSec){
+		RecEntAct.getInstance().getCep().getAction();
+		GetExistFieldURLQueryRightNow get= new GetExistFieldURLQueryRightNow();
+	//	String id=(String)get.realizarPeticion(EPeticiones.GET, URL_QBE_QUERYS+"select%20ID%20from%20contacts%20where%20customFields.Qbe.idais=%27"+listaClientSec.get(0)+"%27",null,null,RecuperadorPropiedadesConfiguracionGenerales.getInstance().getCabecera(),);
+
+	}
+}

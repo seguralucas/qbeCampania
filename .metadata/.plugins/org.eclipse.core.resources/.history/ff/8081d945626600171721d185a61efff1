@@ -1,0 +1,20 @@
+package exit.services.principal;
+
+import java.util.List;
+
+import exit.services.principal.peticiones.EPeticiones;
+import exit.services.principal.peticiones.GetExistFieldURLQueryRightNow;
+
+public class EjecutarQBESP {
+	
+	
+	private final String URL_QBE_SERVICIOS="https://qbe.custhelp.com/services/rest/connect/v1.3/";
+	private final String URL_QBE_QUERYS=URL_QBE_SERVICIOS+"queryResults/?query=";
+	public void ejecutarCampaniaCumpleanios(List<Integer> listaClientSec){
+		
+		GetExistFieldURLQueryRightNow get= new GetExistFieldURLQueryRightNow();
+		String id=(String)get.realizarPeticion(EPeticiones.GET, parametros,null,null,jsonEst.getConfEntidadPart().getCabecera(), jsonEst.getConfEntidadPart());
+
+
+	}
+}

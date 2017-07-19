@@ -1,0 +1,5 @@
+separadorCSV=,
+action=QBEBD
+nivelParalelismo=1
+pathCSVRegistros=C\:/Users/lSegura/Downloads/test.csv
+cabecera={"Authorization": "Basic dXN1YXJpby5pbXBvcnRhZG9yOkx1Y2FzMTIz"}
