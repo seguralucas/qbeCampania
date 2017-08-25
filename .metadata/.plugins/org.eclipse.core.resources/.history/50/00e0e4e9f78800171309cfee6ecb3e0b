@@ -1,0 +1,11 @@
+separadorCSV=;
+usaProxy=NO
+ipProxy=10.152.140.252
+puertoProxy=7777
+entidadesAIntegrar=campania
+borrarDataSetAlFinalizar=false
+action=QBEBDBIENVENIDA
+url=https://qbe.custhelp.com/services/rest/connect/v1.3/contacts
+identificadorAtributo=#
+
+nivelParalelismo=1

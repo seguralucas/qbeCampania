@@ -56,11 +56,11 @@ public class RecuperadorPropiedadesConfiguracionGenerales {
     }
 /*	public String getPathCSVRegistros() {
 		return getValueMap("pathCSVRegistros");
-	}
+	}*/
 
 	public String getUrl() {
 		return getValueMap("url");
-	}*/
+	}
 
 
 	public String getSeparadorCSV() {

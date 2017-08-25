@@ -26,7 +26,7 @@ public class EjecutarQBESP {
 	private final String URL_QBE_QUERYS=URL_QBE_SERVICIOS+"queryResults/?query=";
 	static int contar=0;
 	public void ejecutarCampaniaCumpleanios(final List<Integer> listaClientSec) throws Exception{
-		limpiarCampanias();
+		limpiarCampaniasCumpleaños();
 		final GetExistFieldURLQueryRightNow get= new GetExistFieldURLQueryRightNow();
     	ExecutorService workers = Executors.newFixedThreadPool(RecEntAct.getInstance().getCep().getNivelParalelismo());      	
 	    List<Callable<Void>> tasks = new ArrayList<>();
@@ -50,22 +50,78 @@ public class EjecutarQBESP {
 	    workers.shutdown();
 	}
 	
-	public void limpiarCampanias() throws Exception{
+	public void ejecutarCampaniaBienvenida(final List<Integer> listaClientSec) throws Exception{
+		limpiarCampaniasBienvenida();
+		final GetExistFieldURLQueryRightNow get= new GetExistFieldURLQueryRightNow();
+    	ExecutorService workers = Executors.newFixedThreadPool(RecEntAct.getInstance().getCep().getNivelParalelismo());      	
+	    List<Callable<Void>> tasks = new ArrayList<>();
+		for(final Integer clientSec: listaClientSec){
+			tasks.add(new Callable<Void>() {
+		        public Void call() throws Exception {
+		        	System.out.println(++contar+" de "+listaClientSec.size());
+			String id=(String)get.realizarPeticion(EPeticiones.GET, URL_QBE_QUERYS+"select%20ID%20from%20contacts%20where%20customFields.Qbe.idais=%27"+clientSec+"%27",null,null,RecEntAct.getInstance().getCep().getCabecera(),RecEntAct.getInstance().getCep());		
+			if(id!=null){
+				JSONObject json= ConvertidorJson.convertir("{\"customFields\":{\"Qbe\":{\"CampaniaDeBienvenida\":true}}}");
+				UpdateGenericoRightNow update = new UpdateGenericoRightNow();
+				AbstractJsonRestEstructura restJson= new JsonGenerico(json);
+				restJson.setConfEntidadPart(RecEntAct.getInstance().getCep());
+				update.realizarPeticion(EPeticiones.UPDATE, URL_QBE_SERVICIOS+"contacts",id,restJson,RecEntAct.getInstance().getCep().getCabecera(),RecEntAct.getInstance().getCep());
+					}
+				return null;
+		        }
+			});
+		}
+	    workers.invokeAll(tasks);
+	    workers.shutdown();
+	}
+	
+	public void limpiarCampaniasCumpleaños() throws Exception{
 	    System.out.println("Borrando");
 		GetListIdsQueryRightNow get= new GetListIdsQueryRightNow();
 		int offset=0;
 		int limit=20000;
 		List<String> ids;
 		do{
-			System.out.println("Llego acá");
+			System.out.println(URL_QBE_QUERYS+"select%20id%20from%20contacts%20where%20contacts.customFields.Qbe.CampaniaDeCumpleanios%20=%201%20limit%20"+limit+"%20OFFSET%20"+offset);
 			ids=(List<String>)get.realizarPeticion(EPeticiones.GET, URL_QBE_QUERYS+"select%20id%20from%20contacts%20where%20contacts.customFields.Qbe.CampaniaDeCumpleanios%20=%201%20limit%20"+limit+"%20OFFSET%20"+offset,null,null,RecEntAct.getInstance().getCep().getCabecera(),RecEntAct.getInstance().getCep());
-			System.out.println("Y acá?");
+			for(String id:ids)
+				System.out.println("Resultado: "+id);
 			ExecutorService workers = Executors.newFixedThreadPool(RecEntAct.getInstance().getCep().getNivelParalelismo());      	
 		    List<Callable<Void>> tasks = new ArrayList<>();
 		for(final String id:ids){
 			tasks.add(new Callable<Void>() {
 		        public Void call() throws Exception {
 			JSONObject json= ConvertidorJson.convertir("{\"customFields\":{\"Qbe\":{\"CampaniaDeCumpleanios\":false}}}");
+			UpdateGenericoRightNow update = new UpdateGenericoRightNow();
+			AbstractJsonRestEstructura restJson= new JsonGenerico(json);
+			restJson.setConfEntidadPart(RecEntAct.getInstance().getCep());
+			update.realizarPeticion(EPeticiones.UPDATE, URL_QBE_SERVICIOS+"contacts",id,restJson,RecEntAct.getInstance().getCep().getCabecera(),RecEntAct.getInstance().getCep());
+		        return null;
+		        }
+			});
+		}
+		offset+=limit;
+	    workers.invokeAll(tasks);
+	    workers.shutdown();
+	    System.out.println("Fin borrado");
+		}while(ids!=null && ids.size()==limit);
+	}
+	
+	public void limpiarCampaniasBienvenida() throws Exception{
+	    System.out.println("Borrando");
+		GetListIdsQueryRightNow get= new GetListIdsQueryRightNow();
+		int offset=0;
+		int limit=20000;
+		List<String> ids;		
+		do{
+			System.out.println(URL_QBE_QUERYS+"select%20id%20from%20contacts%20where%20contacts.customFields.Qbe.CampaniaDeBienvenida%20=%201%20limit%20"+limit+"%20OFFSET%20"+offset);
+			ids=(List<String>)get.realizarPeticion(EPeticiones.GET, URL_QBE_QUERYS+"select%20id%20from%20contacts%20where%20contacts.customFields.Qbe.CampaniaDeBienvenida%20=%201%20limit%20"+limit+"%20OFFSET%20"+offset,null,null,RecEntAct.getInstance().getCep().getCabecera(),RecEntAct.getInstance().getCep());
+			ExecutorService workers = Executors.newFixedThreadPool(RecEntAct.getInstance().getCep().getNivelParalelismo());      	
+		    List<Callable<Void>> tasks = new ArrayList<>();
+		for(final String id:ids){
+			tasks.add(new Callable<Void>() {
+		        public Void call() throws Exception {
+			JSONObject json= ConvertidorJson.convertir("{\"customFields\":{\"Qbe\":{\"CampaniaDeBienvenida\":false}}}");
 			UpdateGenericoRightNow update = new UpdateGenericoRightNow();
 			AbstractJsonRestEstructura restJson= new JsonGenerico(json);
 			restJson.setConfEntidadPart(RecEntAct.getInstance().getCep());

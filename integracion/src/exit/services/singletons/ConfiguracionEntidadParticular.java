@@ -22,7 +22,8 @@ public class ConfiguracionEntidadParticular {
 	public static final String ACCION_CSVASERVICIO="CSVASERVICIO";
 	public static final String ACCION_SERVICIOAACSV="SERVICIOAACSV";
 	public static final String ACCION_SERVICIOASERVICIO="SERVICIOASERVICIO";
-	public static final String ACCION_QBEBD="QBEBD";
+	public static final String ACCION_QBEBD_CUMPLEANOS="QBEBDCUMPLEANOS";
+	public static final String ACCION_QBEBD_BIENVENIDA="QBEBDBIENVENIDA";
 	public static final String OUTPUT_FILE_DEFAULT="salida.csv";
 	public static final String OUTPUT_PATH_DEFAULT=".";
 	

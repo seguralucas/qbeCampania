@@ -10,17 +10,24 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import exit.services.fileHandler.CSVHandler;
 import exit.services.fileHandler.DirectorioManager;
 import exit.services.principal.ejecutores.ParalelizadorDistintosFicheros;
+import exit.services.principal.peticiones.EPeticiones;
+import exit.services.principal.peticiones.GetListIdsQueryRightNow;
+import exit.services.principal.peticiones.GetMostrarRequestPorPantalla;
 import exit.services.singletons.ApuntadorDeEntidad;
 import exit.services.singletons.ConfiguracionEntidadParticular;
 import exit.services.singletons.EOutputs;
 import exit.services.singletons.RecuperadorMapeoCsv;
 import exit.services.singletons.RecuperadorPropiedadesBD;
+import exit.services.singletons.RecuperadorPropiedadesConfiguracionGenerales;
 import exit.services.singletons.RecEntAct;
 
 import oracle.jdbc.OracleTypes;
@@ -36,6 +43,7 @@ public class Principal {
 	public static void main(String[] args) throws Exception {		
 		long time_start, time_end;
     	time_start = System.currentTimeMillis();
+
     	ApuntadorDeEntidad ap=ApuntadorDeEntidad.getInstance();
     	if(ap==null)
     		return;
@@ -46,7 +54,9 @@ public class Principal {
 	    		case ConfiguracionEntidadParticular.ACCION_CSVASERVICIO:csvAServicio();break;
 	    		case ConfiguracionEntidadParticular.ACCION_SERVICIOAACSV:servicioACsv(); break;
 	    		case ConfiguracionEntidadParticular.ACCION_SERVICIOASERVICIO:servicioAServicio(); break;
-	    		case ConfiguracionEntidadParticular.ACCION_QBEBD : qbecampania(args);  break;
+	    		case ConfiguracionEntidadParticular.ACCION_QBEBD_CUMPLEANOS : qbecampania(args);  break;
+	    		case ConfiguracionEntidadParticular.ACCION_QBEBD_BIENVENIDA : qbeBienvenida(args);  break;
+	    		case "PRUEBABORRAR" : pruebaBorrar(args);  break;
 	    	}
 	    }
 	    	time_end = System.currentTimeMillis();
@@ -62,7 +72,25 @@ public class Principal {
 /***********************************************************/
 	//	FilesAProcesarManager.getInstance().deleteCSVAProcesar();
 	}
+	
+	
 
+	private static void pruebaBorrar(String[] args){
+		GetMostrarRequestPorPantalla get= new GetMostrarRequestPorPantalla();
+		int offset=0;
+		int limit=20000;
+		List<String> ids;
+		System.out.println(RecuperadorPropiedadesConfiguracionGenerales.getInstance().getUrl());
+		ids=(List<String>)get.realizarPeticion(EPeticiones.GET, RecuperadorPropiedadesConfiguracionGenerales.getInstance().getUrl(),null,null,RecEntAct.getInstance().getCep().getCabecera(),RecEntAct.getInstance().getCep());
+
+	}
+	
+	private static String getCurrentDate(){
+    	DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    	Date date = new Date();
+    	return dateFormat.format(date);
+	}
+	
 	private static void qbecampania(String[] args){
 		try{  			
 			EjecutarQBESP qbe= new EjecutarQBESP();
@@ -81,10 +109,9 @@ public class Principal {
 					coneccion,user,password);  
 			
 			CallableStatement cs = con.prepareCall("{call SP_CRM_CAMPANIA_CUMPLEANIOS(?, ?)}");
-			cs.setString(1, args.length==0?"13/06/2017":args[0]);
+			cs.setString(1, args.length==0?getCurrentDate():args[0]);
 			cs.registerOutParameter(2, OracleTypes.CURSOR);
 			cs.executeUpdate();
-			System.out.println("A ejecutar con fecha: "+ (args.length==0?"13/06/2017":args[0]));
 			ResultSet rs = (ResultSet) cs.getObject(2);
 			while (rs.next()) {                  
   					 listaEnteros.add(rs.getInt(1));
@@ -97,6 +124,43 @@ public class Principal {
   
 			}catch(Exception e){ System.out.println(e);}  
 	}
+	
+	private static void qbeBienvenida(String[] args){
+		try{  			
+			EjecutarQBESP qbe= new EjecutarQBESP();
+			List<Integer> listaEnteros= new ArrayList<Integer>();
+			Class.forName("oracle.jdbc.driver.OracleDriver");  
+			String driverType= RecuperadorPropiedadesBD.getInstance().getDriverType();
+			String user= RecuperadorPropiedadesBD.getInstance().getUser();
+			String password= RecuperadorPropiedadesBD.getInstance().getPassword();
+			String database= RecuperadorPropiedadesBD.getInstance().getDatabase();
+			String puerto= RecuperadorPropiedadesBD.getInstance().getPuerto();
+			String ipConexion= RecuperadorPropiedadesBD.getInstance().getIpConexion();
+			
+			String coneccion=RecuperadorPropiedadesBD.getInstance().getConexion();
+			System.out.println(coneccion+"  "+user+" "+password);
+			Connection con=DriverManager.getConnection(  
+					coneccion,user,password);  
+			CallableStatement cs = con.prepareCall("{call SP_CRM_CAMPAÑA_BIENVENIDA(?, ?)}");
+			cs.setString(1, args.length==0?getCurrentDate():args[0]);
+			cs.registerOutParameter(2, OracleTypes.CURSOR);
+			cs.executeUpdate();
+			ResultSet rs = (ResultSet) cs.getObject(2);
+			while (rs.next()) {                  
+  					 listaEnteros.add(rs.getInt(1));
+			}
+			for(Integer a: listaEnteros)
+				System.out.println(a);
+			  rs.close(); 		
+			con.close();  
+			qbe.ejecutarCampaniaBienvenida(listaEnteros);
+  
+			}catch(Exception e){ System.out.println(e);}  
+	}
+	
+	
+	
+	
 	
 	private static void csvAServicio(){
 		ConfiguracionEntidadParticular r= RecEntAct.getInstance().getCep();

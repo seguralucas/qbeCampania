@@ -1,8 +1,0 @@
-separadorCSV=;
-usaProxy=NO
-ipProxy=10.152.140.252
-puertoProxy=7777
-
-identificadorAtributo=#
-cabecera={"Authorization": "Basic dXN1YXJpby5pbXBvcnRhZG9yOkx1Y2FzMTIz"}
-nivelParalelismo=1
